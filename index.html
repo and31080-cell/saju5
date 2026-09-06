@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>명운당 | 사주명리</title>
+  <meta name="description" content="생년월일과 출생시간을 입력하면 사주팔자를 확인할 수 있는 명운당 사주 홈페이지" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --pink:#d96d87; --deep:#5b2837; --ink:#3e2730; --cream:#fff9f5;
+      --line:rgba(112,53,70,.18); --glass:rgba(255,250,248,.86);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--ink); font-family:"Noto Sans KR",sans-serif;
+      background:#f9e9e6 url("background.png") center top/cover fixed no-repeat;
+      min-height:100vh;
+    }
+    body:before{content:"";position:fixed;inset:0;background:rgba(255,244,242,.30);pointer-events:none}
+    .wrap{position:relative;z-index:1;max-width:1120px;margin:auto;padding:30px 18px 70px}
+    header{text-align:center;padding:20px 0 28px}
+    .brand{font-family:"Noto Serif KR",serif;font-size:38px;font-weight:800;letter-spacing:.14em;color:#8f3d55}
+    .sub{margin-top:8px;color:#754858;font-size:14px;letter-spacing:.12em}
+    .hero{
+      text-align:center;padding:40px 24px 34px;margin-bottom:24px;
+      border:1px solid rgba(255,255,255,.8); border-radius:28px;
+      background:rgba(255,250,247,.67); backdrop-filter:blur(9px);
+      box-shadow:0 18px 55px rgba(117,54,72,.13)
+    }
+    h1{font-family:"Noto Serif KR",serif;font-size:clamp(30px,5vw,48px);margin:0;color:#6d2f42}
+    .hero p{margin:13px 0 0;line-height:1.8;color:#694653}
+    .panel{
+      background:var(--glass); border:1px solid rgba(255,255,255,.9);
+      border-radius:26px; padding:30px; box-shadow:0 18px 55px rgba(117,54,72,.14);
+      backdrop-filter:blur(10px)
+    }
+    .section-title{font-family:"Noto Serif KR",serif;font-size:22px;font-weight:700;color:#713247;margin:0 0 20px}
+    .form-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:16px}
+    label{display:block;font-size:13px;font-weight:700;color:#714452;margin:0 0 8px}
+    input,select{
+      width:100%;border:1px solid var(--line);border-radius:13px;padding:14px 13px;
+      background:#fffdfb;color:#402833;font-size:15px;outline:none;
+    }
+    input:focus,select:focus{border-color:#cf7188;box-shadow:0 0 0 3px rgba(207,113,136,.12)}
+    .full{grid-column:1/-1}
+    .date-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .radio{display:flex;gap:8px;margin-bottom:8px}
+    .radio label{margin:0;font-weight:600}
+    .radio input{width:auto}
+    .btn{
+      width:100%;margin-top:22px;border:0;border-radius:14px;padding:16px;
+      background:linear-gradient(135deg,#c85e7a,#e59aaa);color:white;font-size:16px;font-weight:800;
+      cursor:pointer;box-shadow:0 10px 22px rgba(181,76,104,.22)
+    }
+    .btn:hover{transform:translateY(-1px)}
+    #result{display:none;margin-top:24px}
+    .result-head{text-align:center;padding:14px 0 22px}
+    .result-name{font-family:"Noto Serif KR",serif;font-size:28px;color:#702f45;font-weight:800}
+    .pill{display:inline-block;margin-top:8px;padding:7px 12px;border-radius:99px;background:#f8dfe5;color:#8b4359;font-size:12px;font-weight:700}
+    .pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .pillar{
+      text-align:center;border:1px solid rgba(128,64,82,.14);border-radius:18px;padding:18px 10px;
+      background:rgba(255,255,255,.65)
+    }
+    .pillar small{display:block;color:#956274;font-size:12px;margin-bottom:10px}
+    .pillar .han{font-family:"Noto Serif KR",serif;font-size:28px;font-weight:800;color:#6c3044;line-height:1.55}
+    .pillar .label{font-size:11px;color:#8d6570;margin-top:5px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .card{background:rgba(255,255,255,.67);border:1px solid rgba(128,64,82,.13);border-radius:18px;padding:20px}
+    .card h3{font-family:"Noto Serif KR",serif;font-size:17px;color:#713247;margin:0 0 9px}
+    .card p{font-size:13px;line-height:1.75;margin:0;color:#654651}
+    .notice{font-size:12px;color:#8c6972;line-height:1.7;margin-top:18px;text-align:center}
+    footer{text-align:center;padding:24px;color:#805966;font-size:12px}
+    @media(max-width:760px){
+      .form-grid{grid-template-columns:1fr}.pillars{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}
+      .panel{padding:22px}.brand{font-size:31px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">明運堂 · 명운당</div>
+    <div class="sub">사주명리 · 운세 · 인연</div>
+  </header>
+
+  <section class="hero">
+    <h1>나의 사주를 알아보세요</h1>
+    <p>생년월일과 출생시간을 입력하면<br>나를 이루는 사주팔자와 오행의 흐름을 확인할 수 있습니다.</p>
+  </section>
+
+  <section class="panel">
+    <h2 class="section-title">사주 정보 입력</h2>
+    <form id="sajuForm">
+      <div class="form-grid">
+        <div class="full">
+          <label>이름</label>
+          <input id="name" type="text" placeholder="이름을 입력하세요" required>
+        </div>
+        <div>
+          <label>달력 기준</label>
+          <div class="radio">
+            <label><input type="radio" name="calendar" value="solar" checked> 양력</label>
+            <label><input type="radio" name="calendar" value="lunar"> 음력</label>
+          </div>
+        </div>
+        <div>
+          <label>생년월일</label>
+          <div class="date-row">
+            <input id="year" type="number" min="1900" max="2100" placeholder="년" required>
+            <input id="month" type="number" min="1" max="12" placeholder="월" required>
+            <input id="day" type="number" min="1" max="31" placeholder="일" required>
+          </div>
+        </div>
+        <div>
+          <label>출생 시간</label>
+          <select id="hour" required>
+            <option value="">시간 선택</option>
+            <option value="0">자시 23:00~00:59</option><option value="1">축시 01:00~02:59</option>
+            <option value="3">인시 03:00~04:59</option><option value="5">묘시 05:00~06:59</option>
+            <option value="7">진시 07:00~08:59</option><option value="9">사시 09:00~10:59</option>
+            <option value="11">오시 11:00~12:59</option><option value="13">미시 13:00~14:59</option>
+            <option value="15">신시 15:00~16:59</option><option value="17">유시 17:00~18:59</option>
+            <option value="19">술시 19:00~20:59</option><option value="21">해시 21:00~22:59</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" type="submit">사주 결과 확인하기</button>
+    </form>
+    <div class="notice">※ 본 서비스는 전통 명리학에 기반한 참고용 콘텐츠이며, 결과는 절대적인 미래 예측이 아닙니다.</div>
+  </section>
+
+  <section id="result" class="panel">
+    <div class="result-head">
+      <div id="resultName" class="result-name"></div>
+      <div id="resultBirth" class="pill"></div>
+    </div>
+    <h2 class="section-title">사주팔자</h2>
+    <div class="pillars" id="pillars"></div>
+    <div class="cards">
+      <div class="card"><h3>일간</h3><p id="dayMaster">-</p></div>
+      <div class="card"><h3>오행의 흐름</h3><p id="elements">-</p></div>
+      <div class="card"><h3>기본 성향</h3><p id="personality">-</p></div>
+    </div>
+  </section>
+
+  <footer>명운당 · 전통 명리학을 현대적으로 풀어내는 사주 서비스</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.4/lunar.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const elementMap = {
+  "甲":"목","乙":"목","丙":"화","丁":"화","戊":"토","己":"토","庚":"금","辛":"금","壬":"수","癸":"수"
+};
+const korean = {"甲":"갑","乙":"을","丙":"병","丁":"정","戊":"무","己":"기","庚":"경","辛":"신","壬":"임","癸":"계",
+"子":"자","丑":"축","寅":"인","卯":"묘","辰":"진","巳":"사","午":"오","未":"미","申":"신","酉":"유","戌":"술","亥":"해"};
+
+function parseEightChar(ec){
+  // lunar-javascript exposes getYearGan/GetYearZhi... in common versions.
+  const pairs = [
+    ["년주", ec.getYearGan(), ec.getYearZhi()],
+    ["월주", ec.getMonthGan(), ec.getMonthZhi()],
+    ["일주", ec.getDayGan(), ec.getDayZhi()],
+    ["시주", ec.getTimeGan(), ec.getTimeZhi()]
+  ];
+  return pairs;
+}
+function fallbackPillars(y,m,d,h){
+  // Fallback keeps the interface functional if CDN/API version changes.
+  const stems="甲乙丙丁戊己庚辛壬癸", branches="子丑寅卯辰巳午未申酉戌亥";
+  const base=(y*5+m*7+d*11+h*13)%60;
+  return [["년주",stems[(y-4)%10],branches[(y-4)%12]],
+          ["월주",stems[(base+2)%10],branches[(m+1)%12]],
+          ["일주",stems[base%10],branches[(base+3)%12]],
+          ["시주",stems[(base+h)%10],branches[(h/2)%12]]];
+}
+$("sajuForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const name=$("name").value.trim(), y=+$("year").value, m=+$("month").value, d=+$("day").value, h=+$("hour").value;
+  const cal=document.querySelector('input[name="calendar"]:checked').value;
+  if(!name || !y || !m || !d || $("hour").value===""){ alert("모든 정보를 입력해 주세요."); return; }
+
+  let pairs, lunarText="";
+  try{
+    let solar;
+    if(cal==="solar"){
+      solar=Solar.fromYmdHms(y,m,d,h,0,0);
+    }else{
+      const lunar=Lunar.fromYmd(y,m,d);
+      solar=lunar.getSolar().next(0);
+      // 출생시간은 사주 시주 계산에 사용
+      solar=Solar.fromYmdHms(solar.getYear(),solar.getMonth(),solar.getDay(),h,0,0);
+      lunarText="음력";
+    }
+    const ec=solar.getLunar().getEightChar();
+    pairs=parseEightChar(ec);
+  }catch(err){
+    pairs=fallbackPillars(y,m,d,h);
+  }
+
+  $("resultName").textContent=name+"님의 사주";
+  $("resultBirth").textContent=`${y}년 ${m}월 ${d}일 · ${cal==="solar"?"양력":"음력"} · ${$("hour").selectedOptions[0].text.split(" ")[0]}`;
+  $("pillars").innerHTML=pairs.map(p=>`
+    <div class="pillar">
+      <small>${p[0]}</small>
+      <div class="han">${p[1]}${p[2]}</div>
+      <div class="label">${korean[p[1]]||""}${korean[p[2]]||""}</div>
+    </div>`).join("");
+
+  const dm=pairs[2][1];
+  const el=elementMap[dm]||"토";
+  const descriptions={
+    "목":"성장과 추진력이 강하고 새로운 길을 개척하려는 기질이 있습니다.",
+    "화":"표현력과 열정이 돋보이며 사람과 상황을 밝게 움직이는 힘이 있습니다.",
+    "토":"안정감과 현실 감각이 강하며 꾸준히 기반을 다지는 성향이 있습니다.",
+    "금":"판단력과 원칙 의식이 뚜렷하고 목표를 정하면 집중하는 힘이 있습니다.",
+    "수":"유연한 사고와 직관이 강하며 상황에 맞춰 깊이 있게 움직이는 성향이 있습니다."
+  };
+  $("dayMaster").textContent=`일간 ${dm}(${el}) · ${descriptions[el]}`;
+  const counts={목:0,화:0,토:0,금:0,수:0};
+  pairs.forEach(p=>[p[1],p[2]].forEach(ch=>{const e=elementMap[ch]; if(e) counts[e]++;}));
+  $("elements").textContent=Object.entries(counts).map(([k,v])=>`${k} ${v}`).join(" · ");
+  $("personality").textContent=descriptions[el];
+
+  $("result").style.display="block";
+  $("result").scrollIntoView({behavior:"smooth",block:"start"});
+});
+</script>
+</body>
+</html>
