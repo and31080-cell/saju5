@@ -213,12 +213,13 @@
 
   .modal-overlay{
     position:fixed; inset:0; background:rgba(59,36,48,0.45); z-index:200;
-    display:flex; align-items:center; justify-content:center; padding:20px;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:40px 16px;
   }
   .modal-overlay.hide{ display:none; }
   .modal-box{
     background:#fff; border-radius:24px 8px 24px 8px; padding:30px 26px;
-    width:100%; max-width:380px; max-height:86vh; overflow-y:auto;
+    width:100%; max-width:380px; margin:0 auto;
     box-shadow:0 30px 60px -20px rgba(59,36,48,0.5);
   }
   .modal-box.wide{ max-width:560px; }
@@ -226,22 +227,24 @@
   .modal-box .field-label{ display:block; font-size:12.5px; color:var(--ink-soft); margin:14px 0 6px; font-weight:600; }
   .modal-box input[type=password], .modal-box textarea, .modal-box input[type=text]{
     width:100%; padding:11px 12px; border-radius:12px; border:1px solid var(--line);
-    font-family:var(--font-body); font-size:14.5px; color:var(--ink); resize:vertical;
+    font-family:var(--font-body); font-size:16px; color:var(--ink); resize:vertical;
   }
   .modal-box textarea{ min-height:52px; }
   .modal-btn-row{ display:flex; gap:8px; margin-top:20px; }
   .modal-btn-row button{
     flex:1; padding:12px; border-radius:20px 6px 20px 6px; border:none; cursor:pointer;
-    font-family:var(--font-body); font-size:14.5px; font-weight:700;
+    font-family:var(--font-body); font-size:15px; font-weight:700;
   }
   .modal-btn-row .primary{ background:var(--accent); color:#fff; }
   .modal-btn-row .ghost{ background:var(--tint); color:var(--accent-deep); }
   .modal-btn-row .plain{ background:none; color:var(--ink-soft); font-weight:400; }
   .modal-error{ color:var(--accent-deep); font-size:13px; margin-top:10px; display:none; }
   .admin-toast{
-    position:fixed; left:50%; bottom:30px; transform:translateX(-50%);
+    position:fixed; left:50%; bottom:calc(30px + env(safe-area-inset-bottom, 0px));
+    transform:translateX(-50%);
     background:var(--accent-deep); color:#fff; padding:11px 22px; border-radius:24px;
     font-size:13.5px; z-index:300; box-shadow:0 12px 24px -10px rgba(0,0,0,.35);
+    max-width:88vw; text-align:center;
   }
 
   .kakao-fab{
@@ -409,13 +412,15 @@
 <div class="modal-overlay hide" id="pwModal">
   <div class="modal-box">
     <h3>관리자 모드</h3>
-    <label class="field-label" for="pwInput">비밀번호</label>
-    <input type="password" id="pwInput" placeholder="••••">
-    <p class="modal-error" id="pwError">비밀번호가 올바르지 않아요.</p>
-    <div class="modal-btn-row">
-      <button type="button" class="plain" id="pwCancel">취소</button>
-      <button type="button" class="primary" id="pwConfirm">확인</button>
-    </div>
+    <form id="pwForm">
+      <label class="field-label" for="pwInput">비밀번호</label>
+      <input type="password" id="pwInput" inputmode="numeric" autocomplete="off" placeholder="••••">
+      <p class="modal-error" id="pwError">비밀번호가 올바르지 않아요.</p>
+      <div class="modal-btn-row">
+        <button type="button" class="plain" id="pwCancel">취소</button>
+        <button type="submit" class="primary" id="pwConfirm">확인</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -433,6 +438,26 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+/* ▼▼▼ Firebase 콘솔 > 프로젝트 설정(톱니바퀴) > 일반 탭에서 복사한 값으로 반드시 교체하세요 ▼▼▼ */
+const FIREBASE_CONFIG = {
+  apiKey: "여기에_API_KEY",
+  authDomain: "여기에_프로젝트ID.firebaseapp.com",
+  projectId: "여기에_프로젝트ID",
+  storageBucket: "여기에_프로젝트ID.appspot.com",
+  messagingSenderId: "여기에_발신자ID",
+  appId: "여기에_앱ID"
+};
+try{
+  firebase.initializeApp(FIREBASE_CONFIG);
+  window.__hyDb = firebase.firestore();
+}catch(e){
+  console.warn('Firebase 초기화 실패 - 설정값을 확인하세요. 우선 이 브라우저 저장(localStorage) 모드로 동작합니다.', e);
+  window.__hyDb = null;
+}
+</script>
 <script>
 /* ================= lunar-javascript (6tail) — MIT License =================
    Copyright (c) 2018 6tail — https://github.com/6tail/lunar-javascript
@@ -885,6 +910,8 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
   'use strict';
   var ADMIN_PW = '1234';
   var STORAGE_KEY = 'hy_content_overrides_v1';
+  var HY_DB = window.__hyDb || null;
+  var HY_DOC = HY_DB ? HY_DB.collection('siteContent').doc('hongyeondang') : null;
 
   // key: { label, selector, kind: 'text'|'html'|'href', multiline: bool }
   var FIELDS = [
@@ -960,7 +987,7 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
 
   // ---------- 비밀번호 모달 ----------
   var pwModal=document.getElementById('pwModal'), pwInput=document.getElementById('pwInput'),
-      pwError=document.getElementById('pwError'), pwConfirm=document.getElementById('pwConfirm'),
+      pwError=document.getElementById('pwError'), pwForm=document.getElementById('pwForm'),
       pwCancel=document.getElementById('pwCancel');
 
   document.getElementById('adminModeBtn').addEventListener('click', function(){
@@ -968,9 +995,10 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
     pwModal.classList.remove('hide');
     setTimeout(function(){ pwInput.focus(); }, 30);
   });
-  pwCancel.addEventListener('click', function(){ pwModal.classList.add('hide'); });
-  pwInput.addEventListener('keydown', function(e){ if(e.key==='Enter'){ pwConfirm.click(); } });
-  pwConfirm.addEventListener('click', function(){
+  pwCancel.addEventListener('click', function(){ if(document.activeElement) document.activeElement.blur(); pwModal.classList.add('hide'); });
+  pwForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(document.activeElement) document.activeElement.blur();
     if(pwInput.value === ADMIN_PW){
       pwModal.classList.add('hide');
       openAdminPanel();
@@ -1005,22 +1033,43 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
   document.getElementById('adminClose').addEventListener('click', function(){ adminModal.classList.add('hide'); });
 
   document.getElementById('adminSave').addEventListener('click', function(){
+    if(document.activeElement) document.activeElement.blur();
     var ov = loadOverrides();
     adminFields.querySelectorAll('[data-key]').forEach(function(input){
       ov[input.getAttribute('data-key')] = input.value;
     });
     saveOverrides(ov);
     applyAllOverrides();
-    showToast('저장되었습니다');
     adminModal.classList.add('hide');
+
+    if(HY_DOC){
+      HY_DOC.set(ov).then(function(){
+        showToast('저장되었습니다 (모든 방문자에게 반영돼요)');
+      }).catch(function(e){
+        console.warn('Firestore 저장 실패', e);
+        showToast('이 브라우저에만 저장됐어요. Firebase 연결을 확인해주세요.');
+      });
+    } else {
+      showToast('이 브라우저에만 저장됐어요. Firebase 설정을 연결하면 모든 방문자에게 반영돼요.');
+    }
   });
 
   document.getElementById('adminReset').addEventListener('click', function(){
-    if(!confirm('모든 문구를 기본값으로 되돌릴까요?')) return;
+    if(document.activeElement) document.activeElement.blur();
+    if(!confirm('모든 문구를 기본값으로 되돌릴까요? (모든 방문자에게 반영돼요)')) return;
     saveOverrides({});
     applyAllOverrides();
     buildAdminForm();
-    showToast('기본값으로 초기화되었습니다');
+    if(HY_DOC){
+      HY_DOC.delete().then(function(){
+        showToast('기본값으로 초기화됐어요');
+      }).catch(function(e){
+        console.warn('Firestore 초기화 실패', e);
+        showToast('이 브라우저만 초기화됐어요.');
+      });
+    } else {
+      showToast('이 브라우저의 문구가 초기화됐어요.');
+    }
   });
 
   function showToast(msg){
@@ -1032,7 +1081,18 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
 
   // ---------- 초기화 ----------
   captureDefaults();
-  applyAllOverrides();
+  applyAllOverrides(); // 1) 로컬 캐시로 즉시 표시 (깜빡임 방지)
+
+  if(HY_DOC){
+    HY_DOC.get().then(function(snap){
+      if(snap.exists){
+        saveOverrides(snap.data()); // 로컬 캐시 최신화
+        applyAllOverrides();        // 파이어베이스 최신 문구로 재표시
+      }
+    }).catch(function(e){
+      console.warn('Firestore 읽기 실패 - 로컬 저장 내용으로 표시합니다.', e);
+    });
+  }
 })();
 
 </script>
