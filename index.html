@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta name="naver-site-verification" content="b866860874eec4974ab04b281c0d7dcedb3ddba0" />  
-<meta name="google-site-verification" content="iDQvN-kILZwVELT5cKPrkmw6QI4_T5Iplx2R8DO2a2w" />  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>홍연당 · 나의 사주 즉시 풀이</title>
@@ -106,6 +104,20 @@
     padding:34px 28px;
     margin:0 0 26px;
     box-shadow:0 18px 38px -28px rgba(139,58,74,0.35);
+  }
+
+  /* ---------- Intro Video ---------- */
+  .intro-video-card{
+    padding:0;
+    overflow:hidden;
+  }
+  .intro-video{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:16 / 9;
+    object-fit:cover;
+    background:#000;
   }
   .section-title{
     font-family:var(--font-display);
@@ -298,6 +310,24 @@
 </div>
 
 <div class="wrap">
+
+  <!-- 두 번째 구간: 자동 재생 영상 -->
+  <div class="card intro-video-card" id="introVideoSection">
+    <video
+      class="intro-video"
+      id="introVideo"
+      src="hongyeondang-video.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      webkit-playsinline
+      controls
+      preload="auto"
+      aria-label="홍연당 소개 영상">
+      브라우저에서 영상을 재생할 수 없습니다.
+    </video>
+  </div>
 
   <form class="card" id="birthForm">
     <h2 class="section-title" id="formTitleEl">사주 정보 입력</h2>
@@ -929,6 +959,23 @@ if (typeof window !== 'undefined') { window.HYEngine = { GAN,GAN_HANJA,ZHI,ZHI_H
 </script>
 <script>
 (function(){
+  // 자동재생 보강: muted + playsinline 상태에서 즉시 재생을 요청합니다.
+  var introVideo = document.getElementById('introVideo');
+  if (introVideo) {
+    introVideo.muted = true;
+    introVideo.setAttribute('muted', '');
+    introVideo.setAttribute('playsinline', '');
+    var playIntroVideo = function(){
+      var p = introVideo.play();
+      if (p && typeof p.catch === 'function') p.catch(function(){});
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', playIntroVideo, {once:true});
+    } else {
+      playIntroVideo();
+    }
+  }
+
   'use strict';
   var ADMIN_PW = '1234';
   var STORAGE_KEY = 'hy_content_overrides_v1';
